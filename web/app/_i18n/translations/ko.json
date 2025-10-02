@@ -157,6 +157,45 @@
       "failure": "{action} 명령을 보내지 못했습니다."
     }
   },
+  "settings": {
+    "title": "포털 설정",
+    "subtitle": "포털의 화면 모드와 언어, 모니터링 링크, 자주 변경하지 않는 WOL 설정을 한 곳에서 관리하세요.",
+    "linkLabel": "설정",
+    "appearance": {
+      "title": "화면 모드",
+      "description": "포털 전체에 적용할 테마를 선택하세요.",
+      "light": "라이트 테마",
+      "dark": "다크 테마"
+    },
+    "language": {
+      "title": "언어",
+      "description": "기본으로 사용할 인터페이스 언어를 선택하세요.",
+      "korean": "한국어",
+      "english": "영어"
+    },
+    "monitoring": {
+      "title": "모니터링 링크",
+      "description": "배포 환경 변수를 바꾸지 않고 모니터링 엔드포인트를 덮어쓸 수 있습니다.",
+      "reset": "기본값으로 초기화",
+      "statusLabel": "환경 변수 키",
+      "labels": {
+        "grafana": "Grafana URL",
+        "prom": "Prometheus URL",
+        "kuma": "Uptime Kuma URL",
+        "netdata": "Netdata URL"
+      }
+    },
+    "targets": {
+      "title": "빠른 대상 추가",
+      "description": "설정 패널에서 바로 Wake-on-LAN 대상을 등록할 수 있습니다.",
+      "submit": "대상 저장",
+      "saving": "저장 중…",
+      "success": "대상을 저장했습니다.",
+      "error": "필수 항목을 입력하세요.",
+      "hint": "이름과 IP 주소는 필수입니다. MAC 주소는 지금 입력하거나 나중에 자동으로 채워질 수 있습니다.",
+      "manageLink": "WOL 관리 열기"
+    }
+  },
   "format": {
     "relative": {
       "justNow": "방금 전",

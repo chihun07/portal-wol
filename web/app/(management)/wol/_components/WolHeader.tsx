@@ -3,8 +3,6 @@
 import Link from 'next/link';
 import type { ChangeEventHandler } from 'react';
 
-import { LanguageToggle } from '../../../_components/LanguageToggle';
-import { MoonIcon, SunIcon } from '../../../_components/ThemeIcons';
 import { useLanguage } from '../../../_i18n/LanguageProvider';
 
 type WolHeaderProps = {
@@ -12,32 +10,18 @@ type WolHeaderProps = {
   onFilterChange: ChangeEventHandler<HTMLInputElement>;
   onRefreshStatus: () => void;
   onOpenPortal: () => void;
-  onToggleTheme: () => void;
   onAddTarget: () => void;
-  theme: 'light' | 'dark';
-  themeReady: boolean;
 };
 
-export function WolHeader({
-  filter,
-  onFilterChange,
-  onRefreshStatus,
-  onOpenPortal,
-  onToggleTheme,
-  onAddTarget,
-  theme,
-  themeReady
-}: WolHeaderProps) {
+export function WolHeader({ filter, onFilterChange, onRefreshStatus, onOpenPortal, onAddTarget }: WolHeaderProps) {
   const { t } = useLanguage();
-  const themeLabel = theme === 'light' ? t('common.theme.dark') : t('common.theme.light');
-  const themeAriaLabel = theme === 'light' ? t('common.theme.switchToDark') : t('common.theme.switchToLight');
-  const ThemeIcon = theme === 'light' ? MoonIcon : SunIcon;
   const title = t('wol.header.title');
   const subtitle = t('wol.header.subtitle');
   const searchPlaceholder = t('wol.header.searchPlaceholder');
   const refreshLabel = t('wol.header.refresh');
   const portalLabel = t('wol.header.portal');
   const addTargetLabel = t('wol.header.addTarget');
+  const settingsLabel = t('settings.linkLabel');
 
   return (
     <header className="page-header">
@@ -60,21 +44,9 @@ export function WolHeader({
         <button className="btn secondary" id="open-portal" type="button" aria-haspopup="dialog" onClick={onOpenPortal}>
           {portalLabel}
         </button>
-        <LanguageToggle />
-        <button
-          id="theme-toggle"
-          type="button"
-          className="theme-toggle"
-          onClick={onToggleTheme}
-          aria-label={themeAriaLabel}
-        >
-          {themeReady ? (
-            <ThemeIcon className="theme-toggle__icon" focusable="false" />
-          ) : (
-            <SunIcon className="theme-toggle__icon" focusable="false" />
-          )}
-          <span id="theme-label">{themeLabel}</span>
-        </button>
+        <Link className="btn ghost settings-link" href="/settings">
+          {settingsLabel}
+        </Link>
         <button className="btn primary" id="add-target" onClick={onAddTarget}>
           {addTargetLabel}
         </button>

@@ -12,7 +12,7 @@ export default function MonitoringPage() {
   useBodyClass('portal-body');
   useViewportHeight('--portal-vh');
 
-  const { theme, toggleTheme, ready } = useTheme();
+  useTheme();
   const { view, selectView, iframeSrc, refresh } = usePortalView();
 
   return (
@@ -21,9 +21,6 @@ export default function MonitoringPage() {
         activeView={view}
         onSelectView={selectView}
         onRefresh={refresh}
-        onToggleTheme={toggleTheme}
-        theme={theme}
-        themeReady={ready}
       />
       <PortalFrame src={iframeSrc} />
     </>

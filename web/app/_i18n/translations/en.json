@@ -157,6 +157,45 @@
       "failure": "Failed to send {action} command."
     }
   },
+  "settings": {
+    "title": "Portal Settings",
+    "subtitle": "Adjust how the portal looks, choose your language, customize monitoring links, and manage rarely changed Wake-on-LAN options.",
+    "linkLabel": "Settings",
+    "appearance": {
+      "title": "Appearance",
+      "description": "Choose a theme for the entire portal.",
+      "light": "Light theme",
+      "dark": "Dark theme"
+    },
+    "language": {
+      "title": "Language",
+      "description": "Pick the default language for the interface.",
+      "korean": "한국어",
+      "english": "English"
+    },
+    "monitoring": {
+      "title": "Monitoring links",
+      "description": "Override monitoring endpoints without changing deployment environment variables.",
+      "reset": "Reset to defaults",
+      "statusLabel": "Environment key",
+      "labels": {
+        "grafana": "Grafana URL",
+        "prom": "Prometheus URL",
+        "kuma": "Uptime Kuma URL",
+        "netdata": "Netdata URL"
+      }
+    },
+    "targets": {
+      "title": "Quick target setup",
+      "description": "Add a Wake-on-LAN target from the settings panel without leaving the page.",
+      "submit": "Save target",
+      "saving": "Saving…",
+      "success": "Target saved.",
+      "error": "Please fill in the required fields.",
+      "hint": "Name and IP address are required. MAC can be added now or detected later.",
+      "manageLink": "Open WOL management"
+    }
+  },
   "format": {
     "relative": {
       "justNow": "just now",

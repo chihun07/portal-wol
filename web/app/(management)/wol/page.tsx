@@ -34,7 +34,7 @@ const ACTION_LOG_LIMIT = 120;
 export default function WolPage() {
   useBodyClass('wol-body');
 
-  const { theme, toggleTheme, ready } = useTheme();
+  useTheme();
   const { t } = useLanguage();
   const { toasts, showToast } = useToastQueue();
 
@@ -315,10 +315,7 @@ export default function WolPage() {
         onFilterChange={(event) => setFilter(event.target.value)}
         onRefreshStatus={() => refreshStatuses({ log: true })}
         onOpenPortal={() => setPortalOpen(true)}
-        onToggleTheme={toggleTheme}
         onAddTarget={openCreateModal}
-        theme={theme}
-        themeReady={ready}
       />
 
       <main className="layout">

@@ -4,11 +4,18 @@ export type PortalView = 'grafana' | 'prom' | 'kuma' | 'netdata';
 
 export const PORTAL_VIEWS: PortalView[] = ['grafana', 'prom', 'kuma', 'netdata'];
 
-const DEFAULT_PORTAL_ROUTES: Record<PortalView, string> = {
+export const DEFAULT_PORTAL_ROUTES: Record<PortalView, string> = {
   grafana: 'https://mon-core.tail85b0de.ts.net:445/',
   prom: 'https://mon-core.tail85b0de.ts.net/prometheus/targets',
   kuma: 'https://mon-core.tail85b0de.ts.net:444/status/portal',
   netdata: 'https://mon-core.tail85b0de.ts.net/netdata/'
+};
+
+export const PORTAL_ENV_KEYS: Record<PortalView, string> = {
+  grafana: 'NEXT_PUBLIC_GRAFANA_URL',
+  prom: 'NEXT_PUBLIC_PROM_URL',
+  kuma: 'NEXT_PUBLIC_KUMA_URL',
+  netdata: 'NEXT_PUBLIC_NETDATA_URL'
 };
 
 function env(key: string, fallback: string): string {
@@ -19,12 +26,22 @@ function env(key: string, fallback: string): string {
   return fallback;
 }
 
-export const PORTAL_ROUTES: Record<PortalView, string> = {
-  grafana: env('NEXT_PUBLIC_GRAFANA_URL', DEFAULT_PORTAL_ROUTES.grafana),
-  prom: env('NEXT_PUBLIC_PROM_URL', DEFAULT_PORTAL_ROUTES.prom),
-  kuma: env('NEXT_PUBLIC_KUMA_URL', DEFAULT_PORTAL_ROUTES.kuma),
-  netdata: env('NEXT_PUBLIC_NETDATA_URL', DEFAULT_PORTAL_ROUTES.netdata)
+export const ENV_PORTAL_ROUTES: Record<PortalView, string> = {
+  grafana: env(PORTAL_ENV_KEYS.grafana, DEFAULT_PORTAL_ROUTES.grafana),
+  prom: env(PORTAL_ENV_KEYS.prom, DEFAULT_PORTAL_ROUTES.prom),
+  kuma: env(PORTAL_ENV_KEYS.kuma, DEFAULT_PORTAL_ROUTES.kuma),
+  netdata: env(PORTAL_ENV_KEYS.netdata, DEFAULT_PORTAL_ROUTES.netdata)
 };
+
+export function resolvePortalRoutes(
+  overrides: Partial<Record<PortalView, string>> = {}
+): Record<PortalView, string> {
+  return PORTAL_VIEWS.reduce<Record<PortalView, string>>((acc, view) => {
+    const override = overrides[view];
+    acc[view] = override && override.trim() ? override.trim() : ENV_PORTAL_ROUTES[view];
+    return acc;
+  }, {} as Record<PortalView, string>);
+}
 
 export type PortalLink = {
   id: string;
@@ -34,21 +51,17 @@ export type PortalLink = {
   accent?: boolean;
 };
 
-type PortalLinkDefinition = Omit<PortalLink, 'label'> & { labelKey: string };
-
-const PORTAL_LINK_DEFINITIONS: PortalLinkDefinition[] = [
-  { id: 'grafana', labelKey: 'monitoring.links.grafana', href: PORTAL_ROUTES.grafana, external: true },
-  { id: 'prom', labelKey: 'monitoring.links.prom', href: PORTAL_ROUTES.prom, external: true },
-  { id: 'kuma', labelKey: 'monitoring.links.kuma', href: PORTAL_ROUTES.kuma, external: true },
-  { id: 'netdata', labelKey: 'monitoring.links.netdata', href: PORTAL_ROUTES.netdata, external: true },
-  { id: 'wol', labelKey: 'monitoring.links.wol', href: '/wol', accent: true }
-];
-
-export function getPortalLinks(t: TranslateFn): PortalLink[] {
-  return PORTAL_LINK_DEFINITIONS.map(({ labelKey, ...link }) => ({
-    ...link,
-    label: t(labelKey)
-  }));
+export function getPortalLinks(
+  t: TranslateFn,
+  routes: Record<PortalView, string>
+): PortalLink[] {
+  return [
+    { id: 'grafana', label: t('monitoring.links.grafana'), href: routes.grafana, external: true },
+    { id: 'prom', label: t('monitoring.links.prom'), href: routes.prom, external: true },
+    { id: 'kuma', label: t('monitoring.links.kuma'), href: routes.kuma, external: true },
+    { id: 'netdata', label: t('monitoring.links.netdata'), href: routes.netdata, external: true },
+    { id: 'wol', label: t('monitoring.links.wol'), href: '/wol', accent: true }
+  ];
 }
 
 export function formatPortalViewLabel(view: PortalView, t: TranslateFn): string {

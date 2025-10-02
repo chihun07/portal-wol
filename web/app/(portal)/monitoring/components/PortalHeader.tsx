@@ -10,17 +10,13 @@ import {
   type PortalLink,
   type PortalView
 } from '../constants';
-import { MoonIcon, SunIcon } from '../../../_components/ThemeIcons';
-import { LanguageToggle } from '../../../_components/LanguageToggle';
 import { useLanguage } from '../../../_i18n/LanguageProvider';
+import { usePortalConfig } from '../../../_settings/PortalConfigProvider';
 
 type PortalHeaderProps = {
   activeView: PortalView;
   onSelectView: (view: PortalView) => void;
   onRefresh: () => void;
-  onToggleTheme: () => void;
-  theme: 'light' | 'dark';
-  themeReady: boolean;
 };
 
 function renderLink(link: PortalLink, onNavigate?: () => void) {
@@ -60,11 +56,12 @@ function renderMenuItem(link: PortalLink, onNavigate?: () => void) {
   );
 }
 
-export function PortalHeader({ activeView, onSelectView, onRefresh, onToggleTheme, theme, themeReady }: PortalHeaderProps) {
+export function PortalHeader({ activeView, onSelectView, onRefresh }: PortalHeaderProps) {
   const { t } = useLanguage();
+  const { routes } = usePortalConfig();
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement | null>(null);
-  const portalLinks = useMemo(() => getPortalLinks(t), [t]);
+  const portalLinks = useMemo(() => getPortalLinks(t, routes), [routes, t]);
 
   useEffect(() => {
     if (!menuOpen) {
@@ -85,34 +82,20 @@ export function PortalHeader({ activeView, onSelectView, onRefresh, onToggleThem
     return () => document.removeEventListener('click', handleClick);
   }, [menuOpen]);
 
-  const themeLabel = theme === 'light' ? t('common.theme.dark') : t('common.theme.light');
-  const themeAriaLabel = theme === 'light' ? t('common.theme.switchToDark') : t('common.theme.switchToLight');
-  const ThemeIcon = theme === 'light' ? MoonIcon : SunIcon;
   const portalTitle = t('monitoring.title');
   const moreLabel = t('monitoring.more');
   const navLabel = t('monitoring.services');
   const refreshLabel = t('monitoring.refresh');
+  const settingsLabel = t('settings.linkLabel');
 
   return (
     <header className="portal-header">
       <div className="portal-headbar">
         <span className="portal-title">{portalTitle}</span>
         <div className="portal-spacer" />
-        <LanguageToggle />
-        <button
-          id="theme-toggle"
-          type="button"
-          className="theme-toggle"
-          onClick={onToggleTheme}
-          aria-label={themeAriaLabel}
-        >
-          {themeReady ? (
-            <ThemeIcon className="theme-toggle__icon" focusable="false" />
-          ) : (
-            <SunIcon className="theme-toggle__icon" focusable="false" />
-          )}
-          <span id="theme-label">{themeLabel}</span>
-        </button>
+        <Link className="btn ghost settings-link" href="/settings">
+          {settingsLabel}
+        </Link>
         <nav className="portal-links" aria-label={navLabel}>
           {portalLinks.map((link) => (
             <Fragment key={link.id}>{renderLink(link)}</Fragment>
