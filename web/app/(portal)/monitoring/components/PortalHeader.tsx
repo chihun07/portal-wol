@@ -1,24 +1,22 @@
 'use client';
 
 import Link from 'next/link';
-import { Fragment, useEffect, useRef, useState } from 'react';
+import { Fragment, useEffect, useMemo, useRef, useState } from 'react';
 
 import {
-  PORTAL_LINKS,
   PORTAL_VIEWS,
+  getPortalLinks,
   formatPortalViewLabel,
   type PortalLink,
   type PortalView
 } from '../constants';
-import { MoonIcon, SunIcon } from '../../../_components/ThemeIcons';
+import { useLanguage } from '../../../_i18n/LanguageProvider';
+import { usePortalConfig } from '../../../_settings/PortalConfigProvider';
 
 type PortalHeaderProps = {
   activeView: PortalView;
   onSelectView: (view: PortalView) => void;
   onRefresh: () => void;
-  onToggleTheme: () => void;
-  theme: 'light' | 'dark';
-  themeReady: boolean;
 };
 
 function renderLink(link: PortalLink, onNavigate?: () => void) {
@@ -58,9 +56,12 @@ function renderMenuItem(link: PortalLink, onNavigate?: () => void) {
   );
 }
 
-export function PortalHeader({ activeView, onSelectView, onRefresh, onToggleTheme, theme, themeReady }: PortalHeaderProps) {
+export function PortalHeader({ activeView, onSelectView, onRefresh }: PortalHeaderProps) {
+  const { t } = useLanguage();
+  const { routes } = usePortalConfig();
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement | null>(null);
+  const portalLinks = useMemo(() => getPortalLinks(t, routes), [routes, t]);
 
   useEffect(() => {
     if (!menuOpen) {
@@ -81,31 +82,22 @@ export function PortalHeader({ activeView, onSelectView, onRefresh, onToggleThem
     return () => document.removeEventListener('click', handleClick);
   }, [menuOpen]);
 
-  const themeLabel = theme === 'light' ? 'Dark' : 'Light';
-  const themeAriaLabel = theme === 'light' ? 'Switch to dark theme' : 'Switch to light theme';
-  const ThemeIcon = theme === 'light' ? MoonIcon : SunIcon;
+  const portalTitle = t('monitoring.title');
+  const moreLabel = t('monitoring.more');
+  const navLabel = t('monitoring.services');
+  const refreshLabel = t('monitoring.refresh');
+  const settingsLabel = t('settings.linkLabel');
 
   return (
     <header className="portal-header">
       <div className="portal-headbar">
-        <span className="portal-title">Monitoring Portal</span>
+        <span className="portal-title">{portalTitle}</span>
         <div className="portal-spacer" />
-        <button
-          id="theme-toggle"
-          type="button"
-          className="theme-toggle"
-          onClick={onToggleTheme}
-          aria-label={themeAriaLabel}
-        >
-          {themeReady ? (
-            <ThemeIcon className="theme-toggle__icon" focusable="false" />
-          ) : (
-            <SunIcon className="theme-toggle__icon" focusable="false" />
-          )}
-          <span id="theme-label">{themeLabel}</span>
-        </button>
-        <nav className="portal-links" aria-label="Monitoring services">
-          {PORTAL_LINKS.map((link) => (
+        <Link className="btn ghost settings-link" href="/settings">
+          {settingsLabel}
+        </Link>
+        <nav className="portal-links" aria-label={navLabel}>
+          {portalLinks.map((link) => (
             <Fragment key={link.id}>{renderLink(link)}</Fragment>
           ))}
         </nav>
@@ -117,10 +109,10 @@ export function PortalHeader({ activeView, onSelectView, onRefresh, onToggleThem
             aria-expanded={menuOpen}
             onClick={() => setMenuOpen((prev) => !prev)}
           >
-            More
+            {moreLabel}
           </button>
           <div className="portal-menu__dropdown" id="portal-menu" role="menu" aria-hidden={!menuOpen}>
-            {PORTAL_LINKS.map((link) => (
+            {portalLinks.map((link) => (
               <Fragment key={link.id}>{renderMenuItem(link, () => setMenuOpen(false))}</Fragment>
             ))}
           </div>
@@ -131,7 +123,7 @@ export function PortalHeader({ activeView, onSelectView, onRefresh, onToggleThem
           type="button"
           id="portal-refresh"
           className="portal-tabs__button portal-tabs__button--refresh"
-          aria-label="Refresh current view"
+          aria-label={refreshLabel}
           onClick={onRefresh}
         >
           ↻
@@ -145,7 +137,7 @@ export function PortalHeader({ activeView, onSelectView, onRefresh, onToggleThem
             aria-selected={activeView === view}
             onClick={() => onSelectView(view)}
           >
-            {formatPortalViewLabel(view)}
+            {formatPortalViewLabel(view, t)}
           </button>
         ))}
       </div>

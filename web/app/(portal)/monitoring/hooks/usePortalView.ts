@@ -2,7 +2,8 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
-import { PORTAL_ROUTES, PORTAL_VIEWS, type PortalView } from '../constants';
+import { PORTAL_VIEWS, type PortalView } from '../constants';
+import { usePortalConfig } from '../../../_settings/PortalConfigProvider';
 
 function resolveInitialView(): PortalView {
   if (typeof window === 'undefined') {
@@ -16,6 +17,7 @@ function resolveInitialView(): PortalView {
 }
 
 export function usePortalView() {
+  const { routes } = usePortalConfig();
   const [view, setView] = useState<PortalView>(() => resolveInitialView());
   const [refreshToken, setRefreshToken] = useState(0);
 
@@ -38,7 +40,7 @@ export function usePortalView() {
     window.history.replaceState(null, '', `#${view}`);
   }, [view]);
 
-  const baseSrc = PORTAL_ROUTES[view] ?? PORTAL_ROUTES.grafana;
+  const baseSrc = routes[view] ?? routes.grafana;
 
   const iframeSrc = useMemo(() => {
     if (!refreshToken) {

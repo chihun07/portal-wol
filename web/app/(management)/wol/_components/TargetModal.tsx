@@ -3,6 +3,7 @@
 import type { FormEventHandler } from 'react';
 
 import type { TargetFormState } from '../_lib/types';
+import { useLanguage } from '../../../_i18n/LanguageProvider';
 
 type TargetModalProps = {
   open: boolean;
@@ -15,9 +16,13 @@ type TargetModalProps = {
 };
 
 export function TargetModal({ open, mode, form, error, onChange, onClose, onSubmit }: TargetModalProps) {
+  const { t } = useLanguage();
+
   if (!open) {
     return null;
   }
+
+  const title = mode === 'edit' ? t('wol.targetModal.title.edit') : t('wol.targetModal.title.create');
 
   return (
     <div
@@ -33,9 +38,9 @@ export function TargetModal({ open, mode, form, error, onChange, onClose, onSubm
     >
       <div className="dialog-shell">
         <form id="target-form" onSubmit={onSubmit}>
-          <h2 id="target-modal-title">{mode === 'edit' ? 'Edit Target' : 'Add Target'}</h2>
+          <h2 id="target-modal-title">{title}</h2>
           <label className="field">
-            <span>Name</span>
+            <span>{t('wol.targetModal.fields.name')}</span>
             <input
               name="name"
               value={form.name}
@@ -46,42 +51,42 @@ export function TargetModal({ open, mode, form, error, onChange, onClose, onSubm
               pattern="[a-z0-9-]+"
               autoComplete="off"
             />
-            <small>Use lowercase letters, numbers, and hyphen only (e.g., mainpc).</small>
+            <small>{t('wol.targetModal.fields.nameHint')}</small>
           </label>
           <label className="field">
-            <span>IP address</span>
+            <span>{t('wol.targetModal.fields.ip')}</span>
             <input
               name="ip"
               value={form.ip}
               onChange={(event) => onChange({ ...form, ip: event.target.value })}
               required
-              placeholder="192.168.0.10"
+              placeholder={t('wol.targetModal.fields.ipPlaceholder')}
               autoComplete="off"
             />
           </label>
           <details className="field advanced" open={Boolean(form.mac)}>
-            <summary>Advanced (MAC address)</summary>
+            <summary>{t('wol.targetModal.fields.advancedSummary')}</summary>
             <label>
-              <span>MAC address (optional)</span>
+              <span>{t('wol.targetModal.fields.mac')}</span>
               <input
                 name="mac"
                 value={form.mac}
                 onChange={(event) => onChange({ ...form, mac: event.target.value })}
-                placeholder="AA:BB:CC:DD:EE:FF"
+                placeholder={t('wol.targetModal.fields.macPlaceholder')}
                 autoComplete="off"
               />
             </label>
-            <small>If omitted, MAC is learned automatically when the device is online.</small>
+            <small>{t('wol.targetModal.fields.macHint')}</small>
           </details>
           <p className="form-error" id="target-form-error">
             {error}
           </p>
           <div className="modal-actions">
             <button type="submit" className="btn primary" id="target-save">
-              Save
+              {t('wol.targetModal.actions.save')}
             </button>
             <button type="button" className="btn ghost" onClick={onClose}>
-              Cancel
+              {t('wol.targetModal.actions.cancel')}
             </button>
           </div>
         </form>

@@ -1,5 +1,7 @@
 'use client';
 
+import { useLanguage } from '../../../_i18n/LanguageProvider';
+
 type PortalDialogProps = {
   open: boolean;
   src: string;
@@ -7,9 +9,15 @@ type PortalDialogProps = {
 };
 
 export function PortalDialog({ open, src, onClose }: PortalDialogProps) {
+  const { t } = useLanguage();
+
   if (!open) {
     return null;
   }
+
+  const title = t('monitoring.dialogTitle');
+  const closeLabel = t('monitoring.dialogClose');
+  const iframeTitle = t('monitoring.dialogFrameTitle');
 
   return (
     <div
@@ -25,12 +33,12 @@ export function PortalDialog({ open, src, onClose }: PortalDialogProps) {
     >
       <div className="portal-dialog-shell">
         <header className="portal-dialog__header">
-          <h2 id="portal-dialog-title">Monitoring Portal</h2>
+          <h2 id="portal-dialog-title">{title}</h2>
           <button type="button" className="portal-dialog__close" onClick={onClose}>
-            Close
+            {closeLabel}
           </button>
         </header>
-        <iframe className="portal-dialog__iframe" src={src} title="Monitoring portal" loading="lazy" />
+        <iframe className="portal-dialog__iframe" src={src} title={iframeTitle} loading="lazy" />
       </div>
     </div>
   );
