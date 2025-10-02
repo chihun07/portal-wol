@@ -1,0 +1,21 @@
+﻿services:
+  wolweb:
+    image: wol-web:latest
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+      target: prod
+      args:
+        NEXT_PUBLIC_API_BASE: ${NEXT_PUBLIC_API_BASE:-}
+    # Linux 서버에서 브로드캐스트 송출을 위해 host 네트워크 권장
+    network_mode: host
+    # systemd 서비스와 동시에 실행하면 포트 충돌이 발생하므로 반드시 한 가지 방식만 사용하세요.
+    environment:
+      - HOST=0.0.0.0        # 컨테이너가 직접 수신하도록 바인딩
+      - PORT=8000
+      - NEXT_PUBLIC_API_BASE=${NEXT_PUBLIC_API_BASE:-}
+    command: ["/bin/sh", "-c", "uvicorn app.main:create_app --factory --host ${HOST:-0.0.0.0} --port ${PORT:-8000}"]
+    volumes:
+      - ../.env:/app/.env:ro
+      - ../logs:/app/logs
+    restart: unless-stopped

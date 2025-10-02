@@ -1,0 +1,20 @@
+﻿services:
+  wolweb:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+      target: base
+      args:
+        NEXT_PUBLIC_API_BASE: ${NEXT_PUBLIC_API_BASE:-http://127.0.0.1:8000}
+    command: ["/bin/sh", "-c", "uvicorn app.main:create_app --factory --host ${HOST:-0.0.0.0} --port ${PORT:-8000} --reload"]
+    environment:
+      - HOST=0.0.0.0
+      - PORT=8000
+      - NEXT_PUBLIC_API_BASE=${NEXT_PUBLIC_API_BASE:-http://127.0.0.1:8000}
+    volumes:
+      - ../app:/app/app
+      - ../.env:/app/.env:ro
+      - ../logs:/app/logs
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
