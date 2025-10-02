@@ -5,6 +5,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { useBodyClass } from '../../_hooks/useBodyClass';
 import { useTheme } from '../../_hooks/useTheme';
+import { useLanguage } from '../../_i18n/LanguageProvider';
 import { ConfirmDeleteModal } from './_components/ConfirmDeleteModal';
 import { LogsCard } from './_components/LogsCard';
 import { PortalDialog } from './_components/PortalDialog';
@@ -13,7 +14,7 @@ import { TargetModal } from './_components/TargetModal';
 import { TargetsCard } from './_components/TargetsCard';
 import { ToastContainer } from './_components/ToastContainer';
 import { useToastQueue } from './_hooks/useToastQueue';
-import { ACTION_CONFIG, ACTION_LABELS, PORTAL_URL } from './_lib/constants';
+import { ACTION_ENDPOINTS, PORTAL_URL } from './_lib/constants';
 import { request } from './_lib/api';
 import type {
   LogEntry,
@@ -34,6 +35,7 @@ export default function WolPage() {
   useBodyClass('wol-body');
 
   const { theme, toggleTheme, ready } = useTheme();
+  const { t } = useLanguage();
   const { toasts, showToast } = useToastQueue();
 
   const [targets, setTargets] = useState<Target[]>([]);
@@ -75,15 +77,15 @@ export default function WolPage() {
       const list = Array.isArray(data?.targets) ? data.targets : [];
       setTargets(list);
       if (!silent) {
-        showToast('Targets loaded.', 'success');
+        showToast(t('wol.toasts.targetsLoaded'), 'success');
       }
     } catch (error) {
       console.error(error);
-      showToast('Failed to load targets.', 'error');
+      showToast(t('wol.toasts.targetsLoadFailed'), 'error');
     } finally {
       loadingTargetsRef.current = false;
     }
-  }, [showToast]);
+  }, [showToast, t]);
 
   const refreshStatuses = useCallback(async ({ log = false }: StatusOptions = {}) => {
     if (statusRefreshingRef.current || !targetsRef.current.length) {
@@ -101,12 +103,12 @@ export default function WolPage() {
       }
       await loadTargets({ silent: true });
       if (log) {
-        showToast('Statuses refreshed.', 'success');
+        showToast(t('wol.toasts.statusesRefreshed'), 'success');
       }
     } finally {
       statusRefreshingRef.current = false;
     }
-  }, [loadTargets, showToast]);
+  }, [loadTargets, showToast, t]);
 
   useEffect(() => {
     loadTargets({ silent: true });
@@ -178,7 +180,8 @@ export default function WolPage() {
       const ip = targetForm.ip.trim();
       const mac = targetForm.mac.trim();
       if (!name || !ip) {
-        setTargetError('Please enter both name and IP.');
+        const message = t('wol.toasts.missingFields');
+        setTargetError(message);
         return;
       }
       const payload: Record<string, string> = { name, ip };
@@ -194,7 +197,7 @@ export default function WolPage() {
             },
             body: JSON.stringify(payload)
           });
-          showToast('Updated target.', 'success');
+          showToast(t('wol.toasts.targetUpdated'), 'success');
         } else {
           await request('api/targets', {
             method: 'POST',
@@ -203,7 +206,7 @@ export default function WolPage() {
             },
             body: JSON.stringify(payload)
           });
-          showToast('Added target.', 'success');
+          showToast(t('wol.toasts.targetAdded'), 'success');
         }
         closeTargetModal();
         setEditingTarget(null);
@@ -220,11 +223,11 @@ export default function WolPage() {
               ? detail.detail
               : typeof detail?.message === 'string'
                 ? detail.message
-                : 'Failed to save.';
+                : t('wol.toasts.saveFailed');
         setTargetError(message);
       }
     },
-    [closeTargetModal, editingTarget, loadTargets, showToast, targetForm, targetModalMode]
+    [closeTargetModal, editingTarget, loadTargets, showToast, t, targetForm, targetModalMode]
   );
 
   const handleDelete = useCallback(async () => {
@@ -233,25 +236,29 @@ export default function WolPage() {
     }
     try {
       await request(`api/targets/${encodeURIComponent(confirmTarget.name)}`, { method: 'DELETE' });
-      showToast('Deleted target.', 'success');
+      showToast(t('wol.toasts.targetDeleted'), 'success');
       await loadTargets({ silent: true });
     } catch (error) {
       console.error(error);
-      showToast('Failed to delete target.', 'error');
+      showToast(t('wol.toasts.deleteFailed'), 'error');
     } finally {
       setConfirmTarget(null);
     }
-  }, [confirmTarget, loadTargets, showToast]);
+  }, [confirmTarget, loadTargets, showToast, t]);
 
   const handleAction = useCallback(
     async (target: Target, action: PowerAction) => {
       if (action === 'wake' && !target.has_mac) {
-        showToast('Cannot wake without a MAC address.', 'warning');
+        showToast(t('wol.toasts.macRequired'), 'warning');
         return;
       }
-      const config = ACTION_CONFIG[action];
+      const path = ACTION_ENDPOINTS[action];
+      if (!path) {
+        return;
+      }
       const key = `${action}:${target.name}`;
       const logId = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+      const actionLabel = t(`wol.actions.labels.${action}`);
       setActionLoadingKey(key);
       appendLog({
         id: logId,
@@ -259,21 +266,22 @@ export default function WolPage() {
         action,
         target: target.name,
         status: 'pending',
-        message: `Sending ${ACTION_LABELS[action]} command to ${target.name}…`
+        message: t('wol.actions.progress', { action: actionLabel, target: target.name })
       });
       try {
-        await request(config.path, {
+        await request(path, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({ target: target.name })
         });
+        const successMessage = t('wol.actions.success', { action: actionLabel, target: target.name });
         updateLog(logId, {
           status: 'success',
-          message: config.success(target.name)
+          message: successMessage
         });
-        showToast(config.success(target.name), 'success');
+        showToast(successMessage, 'success');
         await loadTargets({ silent: true });
       } catch (error) {
         console.error(error);
@@ -286,7 +294,8 @@ export default function WolPage() {
               : typeof payload?.detail === 'object' && payload?.detail !== null && 'error' in (payload.detail as Record<string, unknown>)
                 ? String((payload.detail as Record<string, unknown>).error)
                 : undefined;
-        const message = detail || config.failure;
+        const failureMessage = t('wol.actions.failure', { action: actionLabel });
+        const message = detail || failureMessage;
         updateLog(logId, {
           status: 'error',
           message
@@ -296,7 +305,7 @@ export default function WolPage() {
         setActionLoadingKey(null);
       }
     },
-    [appendLog, loadTargets, showToast, updateLog]
+    [appendLog, loadTargets, showToast, t, updateLog]
   );
 
   return (

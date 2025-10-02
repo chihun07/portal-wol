@@ -1,6 +1,7 @@
 'use client';
 
 import type { Target } from '../_lib/types';
+import { useLanguage } from '../../../_i18n/LanguageProvider';
 
 type ConfirmDeleteModalProps = {
   target: Target | null;
@@ -9,6 +10,8 @@ type ConfirmDeleteModalProps = {
 };
 
 export function ConfirmDeleteModal({ target, onConfirm, onCancel }: ConfirmDeleteModalProps) {
+  const { t } = useLanguage();
+
   if (!target) {
     return null;
   }
@@ -26,14 +29,14 @@ export function ConfirmDeleteModal({ target, onConfirm, onCancel }: ConfirmDelet
       }}
     >
       <div className="dialog-shell">
-        <h2 id="confirm-modal-title">Confirm Delete</h2>
-        <p>Delete target {target.name}?</p>
+        <h2 id="confirm-modal-title">{t('wol.confirmDelete.title')}</h2>
+        <p>{t('wol.confirmDelete.message', { name: target.name })}</p>
         <div className="modal-actions">
           <button type="button" className="btn danger" onClick={onConfirm}>
-            Delete
+            {t('wol.confirmDelete.delete')}
           </button>
           <button type="button" className="btn ghost" onClick={onCancel}>
-            Cancel
+            {t('wol.confirmDelete.cancel')}
           </button>
         </div>
       </div>

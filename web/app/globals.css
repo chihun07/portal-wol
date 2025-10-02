@@ -645,9 +645,29 @@ body {
   color: inherit;
 }
 
+.language-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem;
+  min-width: 2.5rem;
+  border-radius: 999px;
+  border: 0.0625rem solid var(--color-border-strong);
+  background: rgba(15, 23, 42, 0.6);
+  color: inherit;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
 .theme-toggle__icon {
   width: 1.25rem;
   height: 1.25rem;
+}
+
+.language-toggle__code {
+  display: inline-block;
 }
 
 .theme-toggle span {
@@ -656,6 +676,10 @@ body {
 }
 
 [data-theme='light'] .theme-toggle {
+  background: rgba(226, 232, 240, 0.85);
+}
+
+[data-theme='light'] .language-toggle {
   background: rgba(226, 232, 240, 0.85);
 }
 
@@ -804,6 +828,7 @@ details.field.advanced summary {
 .portal-dialog__close:focus-visible,
 .btn:focus-visible,
 .theme-toggle:focus-visible,
+.language-toggle:focus-visible,
 input:focus-visible,
 summary:focus-visible {
   outline: 0.125rem solid var(--color-accent-border);

@@ -2,6 +2,7 @@
 
 import type { PowerAction, Target } from '../_lib/types';
 import { formatRelative } from '../_lib/format';
+import { useLanguage } from '../../../_i18n/LanguageProvider';
 
 type TargetsCardProps = {
   targets: Target[];
@@ -20,35 +21,66 @@ export function TargetsCard({
   onEdit,
   onDelete
 }: TargetsCardProps) {
+  const { t } = useLanguage();
+  const title = t('wol.targets.title');
+  const subtitle = t('wol.targets.subtitle');
+  const summary = t('wol.targets.summary', { total: targets.length, showing: filteredTargets.length });
+  const columnLabels = {
+    name: t('wol.targets.columns.name'),
+    ip: t('wol.targets.columns.ip'),
+    mac: t('wol.targets.columns.mac'),
+    status: t('wol.targets.columns.status'),
+    recent: t('wol.targets.columns.recent'),
+    actions: t('wol.targets.columns.actions')
+  };
+  const statusLabels = {
+    online: t('wol.targets.status.online'),
+    offline: t('wol.targets.status.offline'),
+    unknown: t('wol.targets.status.unknown')
+  };
+  const macNotSet = t('wol.targets.macNotSet');
+  const macBadge = t('wol.targets.macMissingBadge');
+  const wakeDisabledLabel = t('wol.targets.wakeDisabled');
+  const wakeTitle = t('wol.targets.wakeTitle');
+  const actionLabels = {
+    wake: t('wol.targets.actions.wake'),
+    shutdown: t('wol.targets.actions.shutdown'),
+    reboot: t('wol.targets.actions.reboot'),
+    edit: t('wol.targets.actions.edit'),
+    delete: t('wol.targets.actions.delete')
+  };
+  const emptyState = t('wol.targets.empty');
+
   return (
     <section className="card targets-card">
       <div className="card-header">
         <div>
-          <h2>Targets</h2>
-          <p className="card-subtitle">Wake, shut down, or reboot devices registered in your Tailnet.</p>
+          <h2>{title}</h2>
+          <p className="card-subtitle">{subtitle}</p>
         </div>
         <span className="status-indicator" id="status-indicator">
-          {`Total ${targets.length} / Showing ${filteredTargets.length}`}
+          {summary}
         </span>
       </div>
       <div className="table-wrapper">
         <table className="targets-table">
           <thead>
             <tr>
-              <th>Name</th>
-              <th>IP</th>
-              <th>MAC</th>
-              <th>Status</th>
-              <th>Recent</th>
-              <th className="actions-col">Actions</th>
+              <th>{columnLabels.name}</th>
+              <th>{columnLabels.ip}</th>
+              <th>{columnLabels.mac}</th>
+              <th>{columnLabels.status}</th>
+              <th>{columnLabels.recent}</th>
+              <th className="actions-col">{columnLabels.actions}</th>
             </tr>
           </thead>
           <tbody>
             {filteredTargets.map((target) => {
               const status = target.online === true ? 'online' : target.online === false ? 'offline' : 'unknown';
-              const statusLabel = status === 'online' ? 'Online' : status === 'offline' ? 'Offline' : 'Unknown';
+              const statusLabel =
+                status === 'online' ? statusLabels.online : status === 'offline' ? statusLabels.offline : statusLabels.unknown;
               const badgeClass = status === 'online' ? 'badge online' : status === 'offline' ? 'badge offline' : 'badge';
-              const mac = target.mac || 'Not set';
+              const mac = target.mac || macNotSet;
               const macClass = target.mac ? '' : 'mac-missing';
               const recent = target.last_wake_at || target.last_status_at || target.updated_at || target.created_at;
               const wakeDisabled = !target.has_mac;
@@ -58,30 +90,30 @@ export function TargetsCard({
 
               return (
                 <tr key={target.name}>
-                  <td data-label="Name">
+                  <td data-label={columnLabels.name}>
                     <div className="target-name">{target.name}</div>
-                    {!target.has_mac ? <span className="badge warn">MAC not set</span> : null}
+                    {!target.has_mac ? <span className="badge warn">{macBadge}</span> : null}
                   </td>
-                  <td data-label="IP">{target.ip ?? '-'}</td>
-                  <td data-label="MAC" className={macClass}>
+                  <td data-label={columnLabels.ip}>{target.ip ?? '-'}</td>
+                  <td data-label={columnLabels.mac} className={macClass}>
                     {mac}
                   </td>
-                  <td data-label="Status">
+                  <td data-label={columnLabels.status}>
                     <span className={badgeClass}>{statusLabel}</span>
                   </td>
-                  <td data-label="Recent">{formatRelative(recent)}</td>
-                  <td className="actions" data-label="Actions">
+                  <td data-label={columnLabels.recent}>{formatRelative(recent, t)}</td>
+                  <td className="actions" data-label={columnLabels.actions}>
                     <div className="button-group">
                       <button
                         className="btn small"
                         data-action="wake"
                         data-name={target.name}
                         disabled={wakeDisabled}
-                        title={wakeDisabled ? 'MAC not set - Wake disabled' : 'Wake on LAN'}
+                        title={wakeDisabled ? wakeDisabledLabel : wakeTitle}
                         data-loading={actionLoadingKey === wakeKey ? 'true' : undefined}
                         onClick={() => onAction(target, 'wake')}
                       >
-                        Wake
+                        {actionLabels.wake}
                       </button>
                       <button
                         className="btn small secondary"
@@ -90,7 +122,7 @@ export function TargetsCard({
                         data-loading={actionLoadingKey === shutdownKey ? 'true' : undefined}
                         onClick={() => onAction(target, 'shutdown')}
                       >
-                        Shutdown
+                        {actionLabels.shutdown}
                       </button>
                       <button
                         className="btn small secondary"
@@ -99,15 +131,15 @@ export function TargetsCard({
                         data-loading={actionLoadingKey === rebootKey ? 'true' : undefined}
                         onClick={() => onAction(target, 'reboot')}
                       >
-                        Reboot
+                        {actionLabels.reboot}
                       </button>
                     </div>
                     <div className="button-group secondary">
                       <button className="btn small ghost" onClick={() => onEdit(target)}>
-                        Edit
+                        {actionLabels.edit}
                       </button>
                       <button className="btn small ghost" onClick={() => onDelete(target)}>
-                        Delete
+                        {actionLabels.delete}
                       </button>
                     </div>
                   </td>
@@ -116,9 +148,7 @@ export function TargetsCard({
             })}
           </tbody>
         </table>
-        {filteredTargets.length === 0 ? (
-          <div className="empty-state">No targets yet. Use the “+ Add Target” button to get started.</div>
-        ) : null}
+        {filteredTargets.length === 0 ? <div className="empty-state">{emptyState}</div> : null}
       </div>
     </section>
   );

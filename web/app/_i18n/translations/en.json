@@ -1,0 +1,167 @@
+{
+  "common": {
+    "theme": {
+      "light": "Light",
+      "dark": "Dark",
+      "switchToLight": "Switch to light theme",
+      "switchToDark": "Switch to dark theme"
+    },
+    "language": {
+      "switchToEnglish": "Switch to English",
+      "switchToKorean": "Switch to Korean",
+      "shortEnglish": "EN",
+      "shortKorean": "KO"
+    },
+    "buttons": {
+      "close": "Close",
+      "cancel": "Cancel",
+      "delete": "Delete",
+      "save": "Save",
+      "clear": "Clear"
+    }
+  },
+  "monitoring": {
+    "title": "Monitoring Portal",
+    "more": "More",
+    "services": "Monitoring services",
+    "refresh": "Refresh current view",
+    "frameTitle": "Monitoring iframe",
+    "dialogTitle": "Monitoring Portal",
+    "dialogClose": "Close",
+    "dialogFrameTitle": "Monitoring portal",
+    "banner": {
+      "description": "Open the monitoring portal anytime for dashboards and telemetry.",
+      "open": "Open Portal"
+    },
+    "links": {
+      "grafana": "Open Grafana",
+      "prom": "Prometheus Targets",
+      "kuma": "Uptime Kuma",
+      "netdata": "Netdata",
+      "wol": "WOL Control"
+    },
+    "views": {
+      "grafana": "Grafana",
+      "prom": "Prometheus",
+      "kuma": "Uptime Kuma",
+      "netdata": "Netdata"
+    }
+  },
+  "wol": {
+    "header": {
+      "title": "WOL-Web",
+      "subtitle": "Control Wake-on-LAN and power actions for your Tailnet devices.",
+      "searchPlaceholder": "Search name or IP",
+      "refresh": "Refresh Status",
+      "portal": "Monitoring Window",
+      "addTarget": "+ Add Target"
+    },
+    "banner": {
+      "title": "Monitoring Portal",
+      "description": "Open the monitoring portal anytime for dashboards and telemetry.",
+      "open": "Open Portal"
+    },
+    "targets": {
+      "title": "Targets",
+      "subtitle": "Wake, shut down, or reboot devices registered in your Tailnet.",
+      "summary": "Total {total} / Showing {showing}",
+      "columns": {
+        "name": "Name",
+        "ip": "IP",
+        "mac": "MAC",
+        "status": "Status",
+        "recent": "Recent",
+        "actions": "Actions"
+      },
+      "status": {
+        "online": "Online",
+        "offline": "Offline",
+        "unknown": "Unknown"
+      },
+      "macNotSet": "Not set",
+      "macMissingBadge": "MAC not set",
+      "wakeDisabled": "MAC not set - Wake disabled",
+      "wakeTitle": "Wake on LAN",
+      "empty": "No targets yet. Use the “+ Add Target” button to get started.",
+      "actions": {
+        "wake": "Wake",
+        "shutdown": "Shutdown",
+        "reboot": "Reboot",
+        "edit": "Edit",
+        "delete": "Delete"
+      }
+    },
+    "logs": {
+      "title": "Action History",
+      "subtitle": "Only commands you trigger from this page are listed.",
+      "clear": "Clear",
+      "empty": "No actions yet. Use the controls above to send a command.",
+      "status": {
+        "pending": "In Progress",
+        "success": "Success",
+        "error": "Failed"
+      },
+      "targetLabel": "Target"
+    },
+    "targetModal": {
+      "title": {
+        "create": "Add Target",
+        "edit": "Edit Target"
+      },
+      "fields": {
+        "name": "Name",
+        "nameHint": "Use lowercase letters, numbers, and hyphen only (e.g., mainpc).",
+        "ip": "IP address",
+        "ipPlaceholder": "192.168.0.10",
+        "advancedSummary": "Advanced (MAC address)",
+        "mac": "MAC address (optional)",
+        "macPlaceholder": "AA:BB:CC:DD:EE:FF",
+        "macHint": "If omitted, MAC is learned automatically when the device is online."
+      },
+      "actions": {
+        "save": "Save",
+        "cancel": "Cancel"
+      }
+    },
+    "confirmDelete": {
+      "title": "Confirm Delete",
+      "message": "Delete target {name}?",
+      "delete": "Delete",
+      "cancel": "Cancel"
+    },
+    "portalDialog": {
+      "title": "Monitoring Portal",
+      "close": "Close",
+      "iframeTitle": "Monitoring portal"
+    },
+    "toasts": {
+      "targetsLoaded": "Targets loaded.",
+      "targetsLoadFailed": "Failed to load targets.",
+      "statusesRefreshed": "Statuses refreshed.",
+      "missingFields": "Please enter both name and IP.",
+      "targetUpdated": "Updated target.",
+      "targetAdded": "Added target.",
+      "saveFailed": "Failed to save.",
+      "targetDeleted": "Deleted target.",
+      "deleteFailed": "Failed to delete target.",
+      "macRequired": "Cannot wake without a MAC address."
+    },
+    "actions": {
+      "labels": {
+        "wake": "Wake",
+        "shutdown": "Shutdown",
+        "reboot": "Reboot"
+      },
+      "progress": "Sending {action} command to {target}…",
+      "success": "Sent {action} command to {target}.",
+      "failure": "Failed to send {action} command."
+    }
+  },
+  "format": {
+    "relative": {
+      "justNow": "just now",
+      "minutesAgo": "{count} min ago",
+      "hoursAgo": "{count} hr ago"
+    }
+  }
+}
