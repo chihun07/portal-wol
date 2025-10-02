@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { FormEvent, useMemo, useState } from 'react';
+import { FormEvent, useEffect, useMemo, useState } from 'react';
 
 import { useBodyClass } from '../_hooks/useBodyClass';
 import { useTheme } from '../_hooks/useTheme';
@@ -18,25 +18,36 @@ import { request } from '../(management)/wol/_lib/api';
 import type { RequestError, TargetFormState } from '../(management)/wol/_lib/types';
 
 type TargetStatus = 'idle' | 'saving' | 'success' | 'error';
+type ConfigStatus = 'idle' | 'saving' | 'success';
 
 const INITIAL_TARGET_FORM: TargetFormState = { name: '', ip: '', mac: '' };
+type PortalRouteDrafts = Partial<Record<PortalView, string | undefined>>;
 
 export default function SettingsPage() {
   useBodyClass('settings-body');
 
   const { language, setLanguage, t } = useLanguage();
   const { theme, setTheme } = useTheme();
-  const { routes, overrides, setRoute, resetRoutes } = usePortalConfig();
+  const { ready, routes, overrides, setRoute, resetRoutes } = usePortalConfig();
 
   const [targetForm, setTargetForm] = useState<TargetFormState>(INITIAL_TARGET_FORM);
   const [targetStatus, setTargetStatus] = useState<TargetStatus>('idle');
   const [targetMessage, setTargetMessage] = useState('');
+  const [routeDrafts, setRouteDrafts] = useState<PortalRouteDrafts>({});
+  const [configStatus, setConfigStatus] = useState<ConfigStatus>('idle');
 
   const updateTargetForm = (patch: Partial<TargetFormState>) => {
     setTargetStatus('idle');
     setTargetMessage('');
     setTargetForm((prev) => ({ ...prev, ...patch }));
   };
+
+  useEffect(() => {
+    if (!ready) {
+      return;
+    }
+    setRouteDrafts({ ...overrides });
+  }, [overrides, ready]);
 
   const appearanceTitle = t('settings.appearance.title');
   const appearanceDescription = t('settings.appearance.description');
@@ -62,6 +73,9 @@ export default function SettingsPage() {
   const monitoringDescription = t('settings.monitoring.description');
   const monitoringResetLabel = t('settings.monitoring.reset');
   const monitoringStatusLabel = t('settings.monitoring.statusLabel');
+  const monitoringHint = t('settings.monitoring.hint');
+  const monitoringSaved = t('settings.monitoring.saved');
+  const monitoringSaving = t('settings.monitoring.saving');
 
   const targetTitle = t('settings.targets.title');
   const targetDescription = t('settings.targets.description');
@@ -69,6 +83,74 @@ export default function SettingsPage() {
   const targetSuccess = t('settings.targets.success');
   const targetError = t('settings.targets.error');
   const targetHint = t('settings.targets.hint');
+  const exitLabel = t('settings.actions.exit');
+  const saveLabel = t('settings.actions.save');
+  const savingLabel = t('settings.actions.saving');
+
+  const hasUnsavedChanges = useMemo(() => {
+    return PORTAL_VIEWS.some((view) => {
+      if (!Object.prototype.hasOwnProperty.call(routeDrafts, view)) {
+        return false;
+      }
+      const draftValue = routeDrafts[view] ?? '';
+      const currentValue = overrides[view] ?? '';
+      return draftValue !== currentValue;
+    });
+  }, [overrides, routeDrafts]);
+
+  const resolveDraftValue = (view: PortalView) => {
+    if (Object.prototype.hasOwnProperty.call(routeDrafts, view)) {
+      return routeDrafts[view] ?? '';
+    }
+    return undefined;
+  };
+
+  const handleRouteDraftChange = (view: PortalView, value: string) => {
+    setRouteDrafts((prev) => ({ ...prev, [view]: value }));
+    setConfigStatus('idle');
+  };
+
+  const handleConfigSave = () => {
+    if (!ready) {
+      return;
+    }
+    setConfigStatus('saving');
+    const normalizedDrafts: PortalRouteDrafts = {};
+    PORTAL_VIEWS.forEach((view) => {
+      const draftValue = Object.prototype.hasOwnProperty.call(routeDrafts, view)
+        ? (routeDrafts[view] ?? '')
+        : overrides[view] ?? '';
+      const normalized = draftValue.trim();
+      setRoute(view, normalized);
+      if (Object.prototype.hasOwnProperty.call(routeDrafts, view)) {
+        normalizedDrafts[view] = normalized;
+      }
+    });
+    setRouteDrafts((prev) => {
+      const next: PortalRouteDrafts = { ...prev };
+      PORTAL_VIEWS.forEach((view) => {
+        if (Object.prototype.hasOwnProperty.call(normalizedDrafts, view)) {
+          const normalized = normalizedDrafts[view] ?? '';
+          if (normalized) {
+            next[view] = normalized;
+          } else {
+            delete next[view];
+          }
+        }
+      });
+      return next;
+    });
+    setConfigStatus('success');
+  };
+
+  const handleResetRoutes = () => {
+    if (!ready) {
+      return;
+    }
+    resetRoutes();
+    setRouteDrafts({});
+    setConfigStatus('idle');
+  };
 
   const handleLanguageChange = (value: Language) => {
     setLanguage(value);
@@ -76,10 +158,6 @@ export default function SettingsPage() {
 
   const handleThemeChange = (value: 'light' | 'dark') => {
     setTheme(value);
-  };
-
-  const handleRouteChange = (view: PortalView, value: string) => {
-    setRoute(view, value);
   };
 
   const handleTargetSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -127,11 +205,30 @@ export default function SettingsPage() {
     }
   };
 
+  const configButtonLabel = configStatus === 'saving' ? savingLabel : saveLabel;
+  const configMessage =
+    configStatus === 'success' ? monitoringSaved : configStatus === 'saving' ? monitoringSaving : monitoringHint;
+
   return (
     <main className="settings-page">
       <header className="settings-header">
-        <h1>{t('settings.title')}</h1>
-        <p>{t('settings.subtitle')}</p>
+        <div className="settings-header__content">
+          <h1>{t('settings.title')}</h1>
+          <p>{t('settings.subtitle')}</p>
+        </div>
+        <div className="settings-header__actions">
+          <Link href="/" className="btn ghost">
+            {exitLabel}
+          </Link>
+          <button
+            type="button"
+            className="btn primary"
+            onClick={handleConfigSave}
+            disabled={!ready || !hasUnsavedChanges || configStatus === 'saving'}
+          >
+            {configButtonLabel}
+          </button>
+        </div>
       </header>
       <section className="settings-grid">
         <article className="settings-card">
@@ -178,24 +275,33 @@ export default function SettingsPage() {
               <h2>{monitoringTitle}</h2>
               <p className="settings-card__description">{monitoringDescription}</p>
             </div>
-            <button type="button" className="btn ghost" onClick={resetRoutes}>
+            <button
+              type="button"
+              className="btn ghost"
+              onClick={handleResetRoutes}
+              disabled={!ready || configStatus === 'saving'}
+            >
               {monitoringResetLabel}
             </button>
           </div>
+          <p className={`settings-message${configStatus === 'success' ? ' settings-message--success' : ''}`}>
+            {configMessage}
+          </p>
           <div className="settings-fields">
             {PORTAL_VIEWS.map((view) => {
               const label = t(`settings.monitoring.labels.${view}`);
               const envKey = PORTAL_ENV_KEYS[view];
               const defaultValue = DEFAULT_PORTAL_ROUTES[view];
               const overrideValue = overrides[view] ?? '';
+              const draftValue = resolveDraftValue(view);
               return (
                 <label key={view} className="settings-field">
                   <span className="settings-field__label">{label}</span>
                   <input
                     type="url"
-                    value={overrideValue || routes[view]}
+                    value={draftValue ?? overrideValue || routes[view]}
                     placeholder={defaultValue}
-                    onChange={(event) => handleRouteChange(view, event.target.value)}
+                    onChange={(event) => handleRouteDraftChange(view, event.target.value)}
                   />
                   <small className="settings-field__hint">
                     {monitoringStatusLabel} <code>{envKey}</code>

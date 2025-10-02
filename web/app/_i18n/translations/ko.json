@@ -161,6 +161,11 @@
     "title": "포털 설정",
     "subtitle": "포털의 화면 모드와 언어, 모니터링 링크, 자주 변경하지 않는 WOL 설정을 한 곳에서 관리하세요.",
     "linkLabel": "설정",
+    "actions": {
+      "exit": "설정 나가기",
+      "save": "변경 사항 저장",
+      "saving": "저장 중…"
+    },
     "appearance": {
       "title": "화면 모드",
       "description": "포털 전체에 적용할 테마를 선택하세요.",
@@ -178,6 +183,9 @@
       "description": "배포 환경 변수를 바꾸지 않고 모니터링 엔드포인트를 덮어쓸 수 있습니다.",
       "reset": "기본값으로 초기화",
       "statusLabel": "환경 변수 키",
+      "hint": "URL을 수정한 뒤 저장하여 기본값을 덮어쓸 수 있습니다.",
+      "saving": "모니터링 링크를 저장하는 중…",
+      "saved": "모니터링 링크가 저장되었습니다.",
       "labels": {
         "grafana": "Grafana URL",
         "prom": "Prometheus URL",

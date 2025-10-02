@@ -161,6 +161,11 @@
     "title": "Portal Settings",
     "subtitle": "Adjust how the portal looks, choose your language, customize monitoring links, and manage rarely changed Wake-on-LAN options.",
     "linkLabel": "Settings",
+    "actions": {
+      "exit": "Exit settings",
+      "save": "Save changes",
+      "saving": "Saving…"
+    },
     "appearance": {
       "title": "Appearance",
       "description": "Choose a theme for the entire portal.",
@@ -178,6 +183,9 @@
       "description": "Override monitoring endpoints without changing deployment environment variables.",
       "reset": "Reset to defaults",
       "statusLabel": "Environment key",
+      "hint": "Update the URLs and save to override the defaults.",
+      "saving": "Saving monitoring links…",
+      "saved": "Monitoring links saved.",
       "labels": {
         "grafana": "Grafana URL",
         "prom": "Prometheus URL",
