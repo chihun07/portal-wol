@@ -1,0 +1,9 @@
+# /etc/logrotate.d/wol-web (예시)
+# 로그 위치는 .env의 LOG_PATH와 일치해야 합니다.
+logs/wol-web.jsonl {
+  size 5M
+  rotate 7
+  compress
+  missingok
+  copytruncate
+}

@@ -1,0 +1,21 @@
+﻿[Unit]
+Description=WOL-Web (FastAPI)
+After=network-online.target tailscaled.service
+Requires=network-online.target
+
+[Service]
+WorkingDirectory=%h/wol-web
+EnvironmentFile=%h/wol-web/.env
+ExecStartPre=%h/wol-web/scripts/build_frontend.sh --skip-install
+ExecStart=%h/wol-web/.venv/bin/uvicorn app.main:create_app --factory --host $HOST --port $PORT
+Restart=always
+User=%i
+Group=%i
+
+# Docker Compose 실행과 병행 금지 (포트 충돌)
+# NoNewPrivileges=true
+# PrivateTmp=true
+# ProtectSystem=full
+
+[Install]
+WantedBy=multi-user.target

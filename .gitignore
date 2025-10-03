@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+.venv/
+.env
+.env.*
+!.env.example
+# Editors
+.vscode/
+.idea/
+# Logs
+logs/
+*.log
+# Docker
+*.pid
+# Node/Next.js
+node_modules/
+.next/
+web/node_modules/
+web/.next/
+web/out/
+# OS
+.DS_Store
+Thumbs.db
