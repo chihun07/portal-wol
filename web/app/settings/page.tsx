@@ -299,7 +299,7 @@ export default function SettingsPage() {
                   <span className="settings-field__label">{label}</span>
                   <input
                     type="url"
-                    value={draftValue ?? overrideValue || routes[view]}
+                    value={draftValue ?? (overrideValue || routes[view])}
                     placeholder={defaultValue}
                     onChange={(event) => handleRouteDraftChange(view, event.target.value)}
                   />

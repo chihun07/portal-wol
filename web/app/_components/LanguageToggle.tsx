@@ -27,7 +27,7 @@ export function LanguageToggle({ className }: LanguageToggleProps) {
   return (
     <button
       type="button"
-      className={`language-toggle${className ? ` ${className}` : ''}`}
+      className={['btn', 'language-toggle', className].filter(Boolean).join(' ')}
       data-language={language}
       onClick={toggleLanguage}
       aria-label={label}
