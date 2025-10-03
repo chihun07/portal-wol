@@ -34,7 +34,7 @@ export function PortalDialog({ open, src, onClose }: PortalDialogProps) {
       <div className="portal-dialog-shell">
         <header className="portal-dialog__header">
           <h2 id="portal-dialog-title">{title}</h2>
-          <button type="button" className="portal-dialog__close" onClick={onClose}>
+          <button type="button" className="btn secondary portal-dialog__close" onClick={onClose}>
             {closeLabel}
           </button>
         </header>

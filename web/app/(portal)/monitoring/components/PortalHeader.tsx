@@ -108,6 +108,7 @@ export function PortalHeader({ activeView, onSelectView, onRefresh }: PortalHead
             aria-haspopup="true"
             aria-expanded={menuOpen}
             onClick={() => setMenuOpen((prev) => !prev)}
+            className="btn ghost portal-menu-toggle"
           >
             {moreLabel}
           </button>
@@ -122,7 +123,7 @@ export function PortalHeader({ activeView, onSelectView, onRefresh }: PortalHead
         <button
           type="button"
           id="portal-refresh"
-          className="portal-tabs__button portal-tabs__button--refresh"
+          className="btn ghost portal-tabs__button portal-tabs__button--refresh"
           aria-label={refreshLabel}
           onClick={onRefresh}
         >
@@ -132,7 +133,14 @@ export function PortalHeader({ activeView, onSelectView, onRefresh }: PortalHead
           <button
             key={view}
             type="button"
-            className={`portal-tabs__button${activeView === view ? ' active' : ''}`}
+            className={[
+              'btn',
+              'ghost',
+              'portal-tabs__button',
+              activeView === view ? 'active' : ''
+            ]
+              .filter(Boolean)
+              .join(' ')}
             data-view={view}
             aria-selected={activeView === view}
             onClick={() => onSelectView(view)}

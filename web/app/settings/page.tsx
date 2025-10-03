@@ -1,6 +1,6 @@
 'use client';
 
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { FormEvent, useEffect, useMemo, useState } from 'react';
 
 import { useBodyClass } from '../_hooks/useBodyClass';
@@ -29,6 +29,30 @@ export default function SettingsPage() {
   const { language, setLanguage, t } = useLanguage();
   const { theme, setTheme } = useTheme();
   const { ready, routes, overrides, setRoute, resetRoutes } = usePortalConfig();
+  const router = useRouter();
+
+  const handleExit = () => {
+    if (typeof window === 'undefined') {
+      router.push('/');
+      return;
+    }
+
+    const referrer = document.referrer;
+
+    if (referrer) {
+      try {
+        const referrerURL = new URL(referrer);
+        if (referrerURL.origin === window.location.origin && window.history.length > 1) {
+          router.back();
+          return;
+        }
+      } catch (error) {
+        // Ignore malformed referrers and fall through to the fallback route.
+      }
+    }
+
+    router.push('/');
+  };
 
   const [targetForm, setTargetForm] = useState<TargetFormState>(INITIAL_TARGET_FORM);
   const [targetStatus, setTargetStatus] = useState<TargetStatus>('idle');
@@ -217,9 +241,9 @@ export default function SettingsPage() {
           <p>{t('settings.subtitle')}</p>
         </div>
         <div className="settings-header__actions">
-          <Link href="/" className="btn ghost">
+          <button type="button" className="btn ghost" onClick={handleExit}>
             {exitLabel}
-          </Link>
+          </button>
           <button
             type="button"
             className="btn primary"
