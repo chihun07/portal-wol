@@ -1,6 +1,6 @@
 ﻿# wol-web    아직 업데이트중입니다
 
-Tailnet 전용 Wake-on-LAN & 전원 제어 대시보드입니다. FastAPI + 정적 프론트엔드로 구성되어 있으며, Docker 또는 systemd 중 하나의 방식으로 구동할 수 있습니다.
+내부 VPN 전용 Wake-on-LAN & 전원 제어 대시보드입니다. FastAPI + 정적 프론트엔드로 구성되어 있으며, Docker 또는 systemd 중 하나의 방식으로 구동할 수 있습니다.
 
 ## Next.js 프론트엔드(`web/`)
 기존 정적 자바스크립트 UI는 Next.js(App Router) 기반 SPA로 재구성되었습니다. FastAPI 백엔드와 동일한 오리진에서 서비스를 제공하면
